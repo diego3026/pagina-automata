@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/estilos.css') }}">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,300&family=Lora:ital,wght@1,500&family=Nanum+Gothic&family=Nunito:ital,wght@0,500;1,300;1,500&family=Quicksand&display=swap" rel="stylesheet">    
+    
+</head>
+<body>
+    <Header class="hero">
+        <p class="hero__title">AUTOMATA</p>
+        <Nav class="hero__nav">
+            <form class="form" method="POST" action="/getPalabra">
+                <input class="form__input form__ele" type="text" name=palabra>
+                <button class="form__btn form__ele" type="submit" value="buscar">buscar palabra</button>
+            </form>
+        </Nav>
+        <div class="hero__idioma">
+            <div class="hero__idioma-español bandera"><img src="{{url_for('static',filename='image/colombia.png')}}"></div>
+            <div class="hero__idioma-ingles bandera"><img src="{{url_for('static',filename='image/eu.png')}}"></div>
+        </div>
+    </Header>
+    <h3>{{estado}}</h3>
+</body>
+</html>
