@@ -5,6 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{url_for('static', filename='css/layout.css')}}">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0
+    .0/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min
+    .js"></script>
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/p
+    opper.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.
+    min.js"></script>
     <title>{% block title %}{% endblock title %}</title>
 </head>
 <body>
@@ -14,5 +26,15 @@
     <img src="{{url_for('static', filename='image/colombia.png')}}" alt="imagen-colombia" style="width: 50px; height: 50px;">
     {% block texto %}{% endblock texto %}
     {% block mostrar %}{% endblock mostrar %}
+    <input class="form-check-input" type="checkbox" role="switch">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>
+    </div>
+    <a class="btn btn-primary" href="https://www.freecodecamp.org/">freeCodeCamp</a> 
+    <div class="custom-control custom-switch">
+        <input type="checkbox" class="custom-control-input" id="customSwitches">
+        <label class="custom-control-label" for="customSwitches">Toggle this switch element</label>
+    </div>
 </body>
 </html>

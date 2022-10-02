@@ -1,97 +1,32 @@
 from flask import Flask,render_template,request,redirect,url_for
-import networkx as nx
+from grafo import buscar,g
 import pyttsx3
-from attr import attr
-# import forms
+from gtts import gTTS
+from playsound import playsound
 
+#español
+ac = gTTS("aceptado")
+ac.save('./app/static/audio/aceptado.mp3')
+noAc = gTTS("denegado")
+noAc.save('./app/static/audio/denegado.mp3')
+
+#ingles
+ac = gTTS("accepted")
+ac.save('./app/static/audio/accepted.mp3')
+noAc = gTTS("denied")
+noAc.save('./app/static/audio/denied.mp3')
 
 app = Flask(__name__)
 
-#configuracion voz
-engine = pyttsx3.init()
-engine.setProperty('rate', 120)
-engine.setProperty('voice', 'spanish')
-engine.setProperty('volume', 2)
-
-#creacion grafo
-g = nx.MultiDiGraph()
-
-#agregacion nodos
-g.add_node("q0")
-g.add_node("q1")
-g.add_node("q2")
-
-#agregar aristas
-g.add_edge("q0","q0","$",attr='$')
-g.add_edge("q0","q1","A",attr="A")
-g.add_edge("q0","q2","B",attr="B")
-g.add_edge("q0","q2","C",attr="C")
-g.add_edge("q1","q1","A",attr="A")
-g.add_edge("q1","q2","C",attr="C")
-g.add_edge("q1","q2","B",attr="B")
-g.add_edge("q2","q2","B",attr="B")
-g.add_edge("q2","q2","C",attr="C")
-
-def buscar(g,palabra):
-    c = 0
-    nodo = 0
-    acumulado = ""
-    
-    if palabra == "$":
-        return "aceptado"
-    else:
-        for i in palabra:
-            c+=1
-            if g.get_edge_data("q0","q1")['A']['attr'] == 'A' and c==1:
-                acumulado+=i
-                nodo = 1
-                if len(palabra) == c and acumulado==palabra:
-                    return "aceptado"
-                else:
-                    continue
-            elif g.get_edge_data("q1","q1")['A']['attr'] == i and nodo==1:
-                acumulado+=i
-                nodo = 1
-                if len(palabra) == c and acumulado==palabra:
-                    return "aceptado"
-                else:
-                    continue
-            elif g.get_edge_data("q1","q2")['B']['attr'] == i or g.get_edge_data("q1","q2")['C']['attr'] == i and nodo==1:
-                acumulado+=i
-                nodo=2
-                if len(palabra) == c and acumulado==palabra:
-                    return "aceptado"
-                else:
-                    continue
-            elif g.get_edge_data("q2","q2")['B']['attr'] == i or g.get_edge_data("q2","q2")['C']['attr'] == i and nodo==2:
-                acumulado+=i
-                nodo = 2
-                if len(palabra) == c and acumulado==palabra:
-                    return "aceptado"
-                else:
-                    continue
-            elif g.get_edge_data("q0","q2")['B']['attr'] == i or g.get_edge_data("q0","q2")['C']['attr'] == i and c==1 and nodo==0:
-                acumulado+=i
-                nodo = 2
-                if len(palabra) == c and acumulado==palabra:
-                    return "aceptado"
-                else:
-                    continue
-            else:
-                return "No aceptado"            
-    
-# if buscar(g,"ACCCC") == "aceptado":
-#     engine.say("aceptado")
-#     engine.runAndWait()
-# else:
-#     engine.say("No aceptado")
-#     engine.runAndWait()
+#diccionario
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    dic = {'ingles':['AUTOMATON','accepted','denied'],'español':['AUTOMATA','aceptado','denegado']}
+    
+    return render_template('index.html',dic=dic)
 
-@app.route('/getPalabra',methods = ['GET','POST'])
+@app.route('/obtPalabra',methods = ['GET','POST'])
 def getPalabra():
     
     if request.method == 'POST':
@@ -100,6 +35,14 @@ def getPalabra():
         
     return render_template('index.html',estado = estado)
     
+@app.route('/obtWord',methods = ['GET','POST'])
+def obtWord():
+    
+    if request.method == 'POST':
+        p = request.form["palabra"]
+        estado = buscar(g,p)
+        
+    return render_template('indexEn.html',estado = estado)    
     
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

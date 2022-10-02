@@ -55,4 +55,17 @@
 
 .hero__idioma-ingles{
     margin: 0 10px;
+    background-image: url("../image/eu.png");
+    width: 38px;
+    height: 38px;
+    background-size: cover;
+    width: 100%;
+}
+
+.hero__idioma-español{
+    background-image: url("../image/colombia.png");
+    width: 38px;
+    height: 38px;
+    background-size: cover;
+    width: 100%;
 }

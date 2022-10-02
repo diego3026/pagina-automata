@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,23 +11,23 @@
 </head>
 <body>
     <Header class="hero">
-        <p class="hero__title">AUTOMATA</p>
+        <p class="hero__title">AUTOMATON</p>
         <Nav class="hero__nav">
-            <form class="form" method="POST" action="/obtPalabra">
-                <input class="form__input form__ele" placeholder="Introduzca la palabra" type="text" name=palabra>
-                <button class="form__btn form__ele" type="submit" value="buscar">buscar palabra</button>
+            <form class="form" method="POST" action="/getPalabra">
+                <input class="form__input form__ele" placeholder="Enter the word" type="text" name=palabra>
+                <button class="form__btn form__ele" type="submit" value="buscar" id="active">search word</button>
             </form>
         </Nav>
-        <div class="hero__idioma">
+        <div class="hero__idioma">            
             <a href="hero__idioma-español bandera"></a>
-            <a href="hero__idioma-ingles bandera"></a>
+            <a href="hero__idioma-ingles bandera"></a>        
         </div>
     </Header>
-    <h3>{% if estado == 'aceptado'%}aceptado{%else%}denegado{%endif%}</h3>
+    <h3>{% if estado == 'aceptado'%}accepted{%else%}denied{%endif%}</h3>
     {% if estado == 'aceptado' %}
-    <audio src="{{url_for('static',filename='audio/aceptado.mp3')}}" autoplay="autoplay"></audio>
+    <audio src="{{url_for('static',filename='audio/accepted.mp3')}}" autoplay="autoplay"></audio>
     {% else %}
-    <audio src="{{url_for('static',filename='audio/denegado.mp3')}}" autoplay="autoplay"></audio>
+    <audio src="{{url_for('static',filename='audio/denied.mp3')}}" autoplay="autoplay"></audio>
     {% endif %}
     <script src="{{url_for('static',filename='js/index.js')}}"></script>
 </body>
