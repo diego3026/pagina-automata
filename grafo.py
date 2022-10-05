@@ -2,6 +2,7 @@ import networkx as nx
 import pyttsx3
 from attr import attr
 
+
 #configuracion voz
 engine = pyttsx3.init()
 engine.setProperty('rate', 120)
@@ -81,3 +82,43 @@ def buscar(g,palabra):
 # else:
 #     engine.say("No aceptado")
 #     engine.runAndWait()
+
+# for c in g.adjacency():
+#     print(c)
+
+from automata.fa.dfa import DFA
+
+dfa = DFA(
+    states = { 'q0' ,  'q1' ,  'q2' }, 
+    input_symbols = { 'A' ,  'B' , 'C' }, 
+    transitions = { 
+        'q0' :  { 'A' :  'q1' , 'B' :  'q2', 'C' : 'q2' }, 
+        'q1' :  { 'A' :  'q1' , 'B' :  'q2' , 'C': 'q2'}, 
+        'q2' :  { 'B' :  'q2' ,  'C' :  'q2' } 
+    }, 
+    initial_state = 'q0' , 
+    final_states = { 'q1' , 'q2' , 'q3' } 
+)
+
+dfa.read_input('A')
+
+
+dfa2 = DFA(
+    states={'q0', 'q1', 'q2'},
+    input_symbols={'0', '1'},
+    transitions={
+        'q0': {'0': 'q0', '1': 'q1'},
+        'q1': {'0': 'q0', '1': 'q2'},
+        'q2': {'0': 'q2', '1': 'q1'}
+    },
+    initial_state='q0',
+    final_states={'q1'}
+)
+
+obj = dfa2.read_input_stepwise('01')
+
+def buscar(dfa, palabra):
+    if dfa2.accepts_input('AA'):
+        return 'aceptado'
+    else:
+        return 'denegado'

@@ -1,0 +1,18 @@
+{
+    "Es":{
+        "automata": "automata",
+        "Idiomas": "Idiomas:",
+        "aceptado":"aceptado",
+        "denegado":"denegado",
+        "buscar":"buscar la palabra",
+        "Velocidad":"Velocidad"
+    },
+    "En":{
+        "automata": "automaton",
+        "Idiomas": "Languages:",
+        "aceptado":"accepted",
+        "denegado":"denied",
+        "buscar":"search the word",
+        "Velocidad":"Speed"
+    }
+}

@@ -1,34 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/normalize.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/estilos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename = 'css/style.css') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,300&family=Lora:ital,wght@1,500&family=Nanum+Gothic&family=Nunito:ital,wght@0,500;1,300;1,500&family=Quicksand&display=swap" rel="stylesheet">  
 </head>
 <body>
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+    <script src="{{url_for('static',filename='js/diagrama.js')}}"></script>
+    <script src="{{url_for('static',filename='js/index.js')}}" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <Header class="hero">
-        <p class="hero__title">AUTOMATON</p>
+        <p class="hero__title lang" key="automata">AUTOMATON</p>
+        <div class="conten-velocidad">
+            <label class="lang" key="Velocidad" for="velocidad">speed</label>
+            <select name="velocidad" id="velocidad" size="1">
+            <option value="2000">x0.25</option>
+            <option value="1250">x0.5</option>
+            <option value="1000" selected>x1</option>
+            <option value="750">x1.5</option>
+            <option value="500">x2</option>
+        </select>
+        </div>
         <Nav class="hero__nav">
-            <form class="form" method="POST" action="/getPalabra">
-                <input class="form__input form__ele" placeholder="Enter the word" type="text" name=palabra>
-                <button class="form__btn form__ele" type="submit" value="buscar" id="active">search word</button>
+            <form class="form" method="POST" action="/obtPalabraEn">
+                <input class="form__input form__ele" type="text" id="textB" name=palabra>
+                <button id="buscarP" class="form__btn form__ele lang" type="submit" value="buscar" key="buscar">search word</button>
             </form>
         </Nav>
-        <div class="hero__idioma">            
-            <a href="hero__idioma-español bandera"></a>
-            <a href="hero__idioma-ingles bandera"></a>        
+        <div class="expresion">
+            <a class="expresion_link" href="{{url_for('static',filename='archivos/dic.txt')}}" download="palabrasAutomata.txt">A*(B ∪ C)*</a>
+        </div>
+        <div class="content">
+            <h4 class="title-idioma lang" key="Idiomas">languages</h4>
+            <div class="hero__idioma">
+                <form action="/">
+                    <button type="submit" title="Español" id="Es" onclick="server.obtLenguaje()" class="hero__idioma-español bandera translate"></button>
+                </form>
+                <button title="Ingles" id="En" onclick="server.obtLenguaje()" class="hero__idioma-ingles bandera translate"></button>
+            </div>
         </div>
     </Header>
-    <h3>{% if estado == 'aceptado'%}accepted{%else%}denied{%endif%}</h3>
-    {% if estado == 'aceptado' %}
-    <audio src="{{url_for('static',filename='audio/accepted.mp3')}}" autoplay="autoplay"></audio>
-    {% else %}
-    <audio src="{{url_for('static',filename='audio/denied.mp3')}}" autoplay="autoplay"></audio>
+    <script>
+        let verificar = document.getElementById("buscarP");
+
+        verificar.onclick = ()=>{ 
+            let texto = document.getElementById("textB").value;
+            let regExp = new RegExp("a*[ab]*","g");
+            regExp = regExp.exec(texto);
+            descolorear(myDiagram, true);
+            try {
+                if(texto == ""){
+                    pintarNodo(myDiagram.findNodeForKey(0));
+                    esAceptado(myDiagram.findNodeForKey(0));
+                }else if(texto == regExp[0]){
+                    tiempo = document.getElementById("velocidad").value;
+                    verificarPalabra(texto, 0, 0, tiempo);
+                }else{
+                    mostrarError();
+                } 
+            } catch (e) {
+                if(e instanceof TypeError){ mostrarError(); }
+            }
+        }
+
+        function verificarPalabra(texto, indice, numNodo, tiempo) {
+            let nodo = myDiagram.findNodeForKey(numNodo);
+            despintarNodo(nodo);
+            window.setTimeout(function(){
+                pintarNodo(nodo);
+                window.setTimeout(function(){
+                    if(indice < texto.length){
+                        let aristas = nodo.findTreeChildrenLinks();
+                        let results = aristas.ub._dataArray.filter(function (arista) { return arista.data.text == texto.charAt(indice) && arista.fromNode == nodo;});   
+                        if(results.length == 0){
+                            descolorear(myDiagram, true);
+                            return esAceptado(nodo, false);
+                        } else if(results[0].data.text == texto.charAt(indice)){
+                            pintarRecorrido(results[0]);
+                            return verificarPalabra(texto, indice + 1, results[0].toNode.data.id, tiempo);
+                        }
+                    }else{ return esAceptado(nodo); }
+                }, tiempo);
+            }, tiempo/2)
+        }
+
+        function pintarRecorrido(arista){
+            despintarNodo(arista.fromNode);
+            pintarNodo(arista.toNode);
+            pintarArista(arista, tiempo);
+        }
+
+        function pintarArista(arista, tiempo) {
+            window.setTimeout(function(){ 
+                arista.path.stroke = "#52ce60";
+            },tiempo/2);
+            window.setTimeout(function(){ 
+                arista.path.stroke = "black";
+            }, tiempo);
+        }
+
+        function pintarNodo(nodo) {
+            var shape = nodo.findObject("SHAPE"); //Obtener la forma de un nodo
+            shape.fill = "red"; //Cambiar el color a un nodo   
+        }
+
+        function despintarNodo(nodo) {
+            if(nodo.data.category == "aceptar"){
+                var shape = nodo.findObject("SHAPE"); //Obtener la forma de un nodo
+                shape.fill = "#37FF1F"; //Cambiar el color a un nodo
+            }else{
+                var shape = nodo.findObject("SHAPE"); //Obtener la forma de un nodo
+                shape.fill = "white"; //Cambiar el color a un nodo
+            }  
+        }
+
+        function descolorear(diagrama, limpiarTodo = false){
+            if(limpiarTodo){
+                despintarNodo(diagrama.findNodeForKey(0));
+                despintarNodo(diagrama.findNodeForKey(1));
+                despintarNodo(diagrama.findNodeForKey(2));
+            }else{
+                despintarNodo(diagrama.findNodeForKey(0));
+                despintarNodo(diagrama.findNodeForKey(1));
+                despintarNodo(diagrama.findNodeForKey(2));
+            }
+        }
+
+        function esAceptado(nodo, vertice = true){
+            if((nodo.data.id == 0 || nodo.data.id == 1 || nodo.data.id == 2) && vertice){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+    </script>
+    <div id="myDiagramDiv" style="width:100%; height:450px; background-color: #DAE4E4;"></div> 
+    <div hidden>
+        <br><br>
+        <button id="SaveButton" onclick="save()">Save</button>  
+        <button onclick="load()">Load</button>
+        Diagram Model saved in JSON format:
+    </div>
+    <textarea id="mySavedModel" style="width:100%;height:300px" hidden>
+        { "class": "GraphLinksModel",
+        "nodeKeyProperty": "id",
+        "nodeDataArray": [
+      {"id":-1,"loc":"18.380952380952394 -11","category":"Start"},
+      {"id":1,"loc":"354.95238095238096 -31.61904761904762","text":"q1","category":"aceptar"},
+      {"text":"q0","loc":"175.1428571428571 94.19047619047618","id":0,"category":"aceptar"},
+      {"text":"q2","loc":"359.42857142857144 114.28571428571428","id":2,"category":"aceptar"}
+      ],
+        "linkDataArray": [
+      {"from":0,"to":2,"text":"b","points":[186.58710817849817,124.06592479887462,217.09593422930521,163.4685082555432,253.53848689921625,192.00006316942626,343.47366877964566,138.6345217533362]},
+      {"from":0,"to":1,"points":[370.90728360130674,-14.474679233025164,420.4761904761905,-7.61904761904762,389.04761904761904,-66.66666666666667,365.1414730461971,-31.61904761904762],"text":"a"},
+      {"from":-1,"to":0,"points":[64.18436155556637,63.069159083562994,75.65211566566045,111.25881292632218,101.85851289983302,124.62701088201601,159.18795449393133,112.46982310884806],"text":"initial state\n"},
+      {"from":0,"to":2,"points":[191.0977597917829,114.98743283167126,238.5190754787623,132.2507242665461,289.38306203935485,137.9732923238386,343.47366877964566,131.20319997225155],"text":"c"},
+      {"from":1,"to":2,"points":[359.7325990222845,-1.7435990106491879,372.4220750118509,36.64002076863437,373.5591717863062,75.31682745337058,363.1716555218576,114.28571428571428],"text":"c"},
+      {"from":1,"to":2,"points":[344.4186333074894,-1.7435990106491843,317.2115991148177,37.57131209017546,318.2412240592606,76.24981724314341,347.67478637190476,114.28571428571428],"text":"b"},
+      {"from":1,"to":1,"points":[189.30142814603897,94.29174932764279,231.22506477401237,50.36090436909681,280.52497094456976,15.86663739276926,338.9974783034552,-9.704061248942836],"text":"a"},
+      {"from":2,"to":2,"points":[368.0528705766813,144.16116289411272,389.0528705766813,180.53422985305914,329.8042722804616,180.53422985305914,350.8042722804616,144.16116289411272],"text":"b"},
+      {"from":2,"to":2,"points":[375.3834740774972,139.879121888504,411.5,164,412.5,108,375.3834740774972,122.8430206194083],"text":"c"}
+      ]}
+    </textarea>
+    {% if estadoEn == 'aceptado' %}
+        <div class="aceptado" id="estado"></div>
+        <audio src="{{url_for('static',filename='audio/accepted.mp3')}}" autoplay="autoplay"></audio>  
+    {% elif estadoEn == 'denegado'  %}
+        <div class="denegado" id="estado"></div>
+        <audio src="{{url_for('static',filename='audio/denied.mp3')}}" autoplay="autoplay"></audio>
     {% endif %}
-    <script src="{{url_for('static',filename='js/index.js')}}"></script>
-</body>
+    </body>
 </html>
