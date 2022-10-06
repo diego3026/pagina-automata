@@ -7,7 +7,6 @@ from flask_babel import Babel,format_date,gettext
 
 app = Flask(__name__)
 app.send_file_max_age_default = timedelta(seconds=1)
-
 lang = 'es'
 # app.config['BABEL_DEFAULT_LOCALE'] = lang   
 babel = Babel(app)
